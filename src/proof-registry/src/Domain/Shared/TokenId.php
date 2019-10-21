@@ -1,7 +1,7 @@
 <?php
 
 
-namespace ProofRegistry\Domain\Movie;
+namespace ProofRegistry\Domain\Shared;
 
 
 class TokenId
@@ -32,5 +32,10 @@ class TokenId
     {
         //@TODO Validate input
         $this->id = $id;
+    }
+
+    public function equals(TokenId $tokenId): bool
+    {
+        return $this->id === $tokenId->id();
     }
 }

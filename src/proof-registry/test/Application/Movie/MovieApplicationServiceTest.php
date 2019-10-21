@@ -7,7 +7,8 @@ use ProofRegistry\Application\Movie\NewMovieCommand;
 use ProofRegistry\Domain\Movie\ImdbId;
 use ProofRegistry\Domain\Movie\Movie;
 use ProofRegistry\Domain\Movie\MovieRepository;
-use ProofRegistry\Domain\Movie\TokenId;
+use ProofRegistry\Domain\RightsHolder\RightsHolderRepository;
+use ProofRegistry\Domain\Shared\TokenId;
 use Tests\TestCase;
 
 class MovieApplicationServiceTest extends TestCase
@@ -16,7 +17,8 @@ class MovieApplicationServiceTest extends TestCase
     {
         $movieRepository = Mockery::mock(MovieRepository::class);
         $movieRepository->shouldReceive('save');
-        $movieAppService = new MovieApplicationService($movieRepository);
+        $rightHolderRepository = Mockery::mock(RightsHolderRepository::class);
+        $movieAppService = new MovieApplicationService($movieRepository, $rightHolderRepository);
         $newMovieCommand = new NewMovieCommand('tt2911666', '0x1234');
 
         $movieAppService->newMovie($newMovieCommand);
@@ -31,8 +33,9 @@ class MovieApplicationServiceTest extends TestCase
         $movieRepository = Mockery::mock(MovieRepository::class);
         $movieRepository->shouldReceive('movieOfImdbId')
             ->andReturn($johnWickMovie);
+        $rightHolderRepository = Mockery::mock(RightsHolderRepository::class);
 
-        $movieAppService = new MovieApplicationService($movieRepository);
+        $movieAppService = new MovieApplicationService($movieRepository, $rightHolderRepository);
         $query = new MovieOfImdbIdQuery('tt2911666');
         $returnedMovie = $movieAppService->movieOfImdbId($query);
 
