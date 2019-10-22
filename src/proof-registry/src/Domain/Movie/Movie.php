@@ -30,6 +30,14 @@ class Movie
     }
 
     /**
+     * @return ImdbId
+     */
+    public function imdbId(): ImdbId
+    {
+        return  $this->imdbId;
+    }
+
+    /**
      * @param RightsHolder $rightsHolder
      * @param int $amount
      */
