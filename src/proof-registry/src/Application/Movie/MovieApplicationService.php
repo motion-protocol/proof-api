@@ -4,6 +4,7 @@
 namespace ProofRegistry\Application\Movie;
 
 
+use ProofRegistry\Application\Movie\DTOs\MovieDTO;
 use ProofRegistry\Domain\Movie\ImdbId;
 use ProofRegistry\Domain\Movie\Movie;
 use ProofRegistry\Domain\Movie\MovieRepository;
@@ -51,14 +52,14 @@ class MovieApplicationService
 
     /**
      * @param MovieOfImdbIdQuery $query
-     * @return Movie
+     * @return MovieDTO
      */
     public function movieOfImdbId(MovieOfImdbIdQuery $query)
     {
         $imdbId = new ImdbId($query->imdbId());
         $movie = $this->movieRepository->movieOfImdbId($imdbId);
 
-        return $movie;
+        return new MovieDTO($movie);
     }
 
     /**

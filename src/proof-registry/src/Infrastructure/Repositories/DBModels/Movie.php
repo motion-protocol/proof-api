@@ -9,7 +9,14 @@ use ProofRegistry\Domain\Movie\Movie as MovieDomainModel;
 
 class Movie extends Model
 {
-
+    protected $primaryKey = 'token_id';
+    protected $keyType = 'string';
+    public $incrementing = false;
+    protected $fillable = [
+        'token_id',
+        'imdb_id',
+        'serialized_model'
+    ];
     /**
      * @return MovieDomainModel
      */

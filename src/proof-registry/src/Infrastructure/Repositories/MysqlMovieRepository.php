@@ -15,14 +15,15 @@ class MysqlMovieRepository implements MovieRepository
 
     public function save(Movie $movie): void
     {
-        $dbMovie = new DBModels\Movie();
-        $attributes = [
-            'token_id' => $movie->tokenId()->id(),
-            'imdb_id' => $movie->imdbId()->id(),
-            'serialized_model' => serialize($movie),
-        ];
-        $dbMovie->setRawAttributes($attributes);
-        $dbMovie->save();
+        DBModels\Movie::updateOrCreate(
+            [
+                'token_id' => $movie->tokenId()->id(),
+                'imdb_id' => $movie->imdbId()->id()
+            ], [
+                'serialized_model' => serialize($movie)
+            ]
+        );
+
     }
 
     public function movieOfImdbId(ImdbId $imdbId): ?Movie
@@ -38,7 +39,12 @@ class MysqlMovieRepository implements MovieRepository
 
     public function movieOfTokenId(TokenId $tokenId): ?Movie
     {
-        // TODO: Implement movieOfTokenId() method.
-        return null;
+        $dbMovie = DBModels\Movie::query()->where('token_id', $tokenId->id())->first();
+        if (!$dbMovie) {
+            return null;
+        }
+        $domainModel = $dbMovie->movieDomainModel();
+
+        return $domainModel;
     }
 }
