@@ -16,11 +16,25 @@ class MovieApplicationServiceTest extends TestCase
     public function testNewMovie()
     {
         $movieRepository = Mockery::mock(MovieRepository::class);
+        $movieRepository->shouldReceive('movieOfImdbId')->andReturn(null);
         $movieRepository->shouldReceive('save');
         $rightHolderRepository = Mockery::mock(RightsHolderRepository::class);
+
         $movieAppService = new MovieApplicationService($movieRepository, $rightHolderRepository);
         $newMovieCommand = new NewMovieCommand('tt2911666', '0x1234');
+        $movieAppService->newMovie($newMovieCommand);
+    }
 
+    public function testAddExistingMovie()
+    {
+        $movie = Mockery::mock(Movie::class);
+        $movieRepository = Mockery::mock(MovieRepository::class);
+        $movieRepository->shouldReceive('movieOfImdbId')->andReturn($movie);
+        $movieRepository->shouldReceive('save');
+        $rightHolderRepository = Mockery::mock(RightsHolderRepository::class);
+
+        $movieAppService = new MovieApplicationService($movieRepository, $rightHolderRepository);
+        $newMovieCommand = new NewMovieCommand('tt2911666', '0x1234');
         $movieAppService->newMovie($newMovieCommand);
     }
 

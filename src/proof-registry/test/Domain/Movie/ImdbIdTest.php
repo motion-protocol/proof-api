@@ -14,13 +14,13 @@ class ImdbIdTest extends TestCase
         $this->assertEquals($validId, $imdbId->id());
     }
 
-//    public function testItFailsWhenInvalidIdIsPassed()
-//    {
-//        $invalidId = 'tt5487tt';
-//        new ImdbId($invalidId);
-//
-//        $this->expectException(InvalidArgumentException::class);
-//    }
+    public function testItFailsWhenInvalidIdIsPassed()
+    {
+        $invalidId = 'tt5487tt';
+        new ImdbId($invalidId);
+
+        $this->expectException(InvalidArgumentException::class);
+    }
 
 
 }
