@@ -8,6 +8,13 @@ services:
       context: docker/php
       dockerfile: Dockerfile
     user: 1000:1000
+    environment:
+      DB_CONNECTION: mysql
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_DATABASE: proof-registry-db
+      DB_USERNAME: db-user
+      DB_PASSWORD: secret
   nginx:
     image: nginx:stable-alpine
     volumes:
@@ -18,8 +25,10 @@ services:
   db:
     image: mariadb
     environment:
-      MYSQL_ALLOW_EMPTY_PASSWORD: 1
-      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_DATABASE: proof-registry-db
+      MYSQL_USER: db-user
+      MYSQL_PASSWORD: secret
+      MYSQL_ROOT_PASSWORD: rootroot
     ports:
       - 3306:3306
     volumes:
