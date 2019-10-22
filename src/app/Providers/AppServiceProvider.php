@@ -3,6 +3,10 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use ProofRegistry\Domain\Movie\MovieRepository;
+use ProofRegistry\Domain\RightsHolder\RightsHolderRepository;
+use ProofRegistry\Infrastructure\Repositories\MysqlMovieRepository;
+use ProofRegistry\Infrastructure\Repositories\MysqlRightsHolderRepository;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -13,7 +17,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        $this->app->bind(MovieRepository::class, MysqlMovieRepository::class);
     }
 
     /**
