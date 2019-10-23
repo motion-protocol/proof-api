@@ -4,6 +4,7 @@
 namespace ProofRegistry\Application\Movie;
 
 
+use ProofRegistry\Application\ApplicationServiceLifeCycle;
 use ProofRegistry\Application\Movie\DTOs\MovieDTO;
 use ProofRegistry\Application\Movie\DTOs\RightsHolderDTO;
 use ProofRegistry\Domain\Movie\ImdbId;
@@ -25,16 +26,26 @@ class MovieApplicationService
      * @var RightsHolderRepository
      */
     private $rightsHolderRepository;
+    /**
+     * @var ApplicationServiceLifeCycle
+     */
+    private $applicationServiceLifeCycle;
 
     /**
      * MovieApplicationService constructor.
      * @param MovieRepository $movieRepository
      * @param RightsHolderRepository $rightsHolderRepository
+     * @param ApplicationServiceLifeCycle $applicationServiceLifeCycle
      */
-    public function __construct(MovieRepository $movieRepository, RightsHolderRepository $rightsHolderRepository)
+    public function __construct(
+        MovieRepository $movieRepository,
+        RightsHolderRepository $rightsHolderRepository,
+        ApplicationServiceLifeCycle $applicationServiceLifeCycle
+    )
     {
         $this->movieRepository = $movieRepository;
         $this->rightsHolderRepository = $rightsHolderRepository;
+        $this->applicationServiceLifeCycle = $applicationServiceLifeCycle;
     }
 
     /**
@@ -42,6 +53,8 @@ class MovieApplicationService
      */
     public function newMovie(NewMovieCommand $command): void
     {
+        $this->applicationServiceLifeCycle->begin();
+
         $imdbId = new ImdbId($command->imdbId());
         $tokenId = new TokenId($command->tokenId());
         $movie = $this->movieRepository->movieOfImdbId($imdbId);
@@ -49,6 +62,8 @@ class MovieApplicationService
             $movie = new Movie($imdbId, $tokenId);
             $this->movieRepository->save($movie);
         }
+
+        $this->applicationServiceLifeCycle->success();
     }
 
     /**
@@ -57,8 +72,12 @@ class MovieApplicationService
      */
     public function movieOfImdbId(MovieOfImdbIdQuery $query)
     {
+        $this->applicationServiceLifeCycle->begin();
+
         $imdbId = new ImdbId($query->imdbId());
         $movie = $this->movieRepository->movieOfImdbId($imdbId);
+
+        $this->applicationServiceLifeCycle->success();
 
         return new MovieDTO($movie);
     }
@@ -68,6 +87,8 @@ class MovieApplicationService
      */
     public function addRightsHolder(AddRightHolderCommand $command)
     {
+        $this->applicationServiceLifeCycle->begin();
+
         $address = new Address($command->address());
         $tokenId = new TokenId($command->tokenId());
         $amount = $command->amount();
@@ -84,6 +105,8 @@ class MovieApplicationService
         $this->rightsHolderRepository->save($rightsHolder);
         $this->movieRepository->save($movie);
 
+        $this->applicationServiceLifeCycle->success();
+
     }
 
     /**
@@ -92,6 +115,8 @@ class MovieApplicationService
      */
     public function movieRightsHolders(MovieRightsHoldersQuery $query): array
     {
+        $this->applicationServiceLifeCycle->begin();
+
         $tokenId = new TokenId($query->tokenId());
         $movie = $this->movieRepository->movieOfTokenId($tokenId);
         $shares = $movie->shares();
@@ -100,6 +125,8 @@ class MovieApplicationService
         }, $shares);
 
         $rightsHolders = $this->rightsHolderRepository->rightsHoldersOfAddresses($rightsHoldersAddresses);
+
+        $this->applicationServiceLifeCycle->success();
 
         return $this->createMovieSharesDTO($shares, $rightsHolders);
     }
