@@ -5,6 +5,7 @@ namespace ProofRegistry\Application\Movie;
 
 
 use ProofRegistry\Application\Movie\DTOs\MovieDTO;
+use ProofRegistry\Application\Movie\DTOs\RightsHolderDTO;
 use ProofRegistry\Domain\Movie\ImdbId;
 use ProofRegistry\Domain\Movie\Movie;
 use ProofRegistry\Domain\Movie\MovieRepository;
@@ -94,12 +95,56 @@ class MovieApplicationService
         $tokenId = new TokenId($query->tokenId());
         $movie = $this->movieRepository->movieOfTokenId($tokenId);
         $shares = $movie->shares();
-        $rightsHoldersAddresses = array_map(function(Share $shares) {
+        $rightsHoldersAddresses = array_map(function (Share $shares) {
             return $shares->rightsHolderAddress();
         }, $shares);
 
         $rightsHolders = $this->rightsHolderRepository->rightsHoldersOfAddresses($rightsHoldersAddresses);
 
-        return $rightsHolders;
+        return $this->createMovieSharesDTO($shares, $rightsHolders);
+    }
+
+    /**
+     * @param Share[] $shares
+     * @param RightsHolder[] $rightsHolders
+     * @return array
+     */
+    private function createMovieSharesDTO(array $shares, array $rightsHolders)
+    {
+        return array_map(function (Share $share) use ($rightsHolders) {
+            $rightsHolder = $this->findRightsHolderByAddress($rightsHolders, $share->rightsHolderAddress());
+            return $this->createMovieShareDTO($share, $rightsHolder);
+        }, $shares);
+    }
+
+    /**
+     * @param array $rightsHolders
+     * @param Address $rightsHolderAddress
+     * @return RightsHolder|null
+     */
+    private function findRightsHolderByAddress(array $rightsHolders, Address $rightsHolderAddress): ?RightsHolder
+    {
+        foreach ($rightsHolders as $rightsHolder) {
+            if ($rightsHolderAddress->equals($rightsHolder->address())) {
+                return $rightsHolder;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @param Share $share
+     * @param RightsHolder|null $rightsHolder
+     * @return RightsHolderDTO
+     */
+    private function createMovieShareDTO(Share $share, ?RightsHolder $rightsHolder): RightsHolderDTO
+    {
+        $name = 'Unknown';
+        if ($rightsHolder) {
+            $name = $rightsHolder->name();
+        }
+
+        return new RightsHolderDTO($share->rightsHolderAddress()->address(), $name, $share->percentage());
     }
 }

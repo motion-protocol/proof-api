@@ -7,6 +7,7 @@ namespace ProofRegistry\Infrastructure\Repositories;
 use ProofRegistry\Domain\RightsHolder\Address;
 use ProofRegistry\Domain\RightsHolder\RightsHolder;
 use ProofRegistry\Domain\RightsHolder\RightsHolderRepository;
+use ProofRegistry\Infrastructure\Repositories\DBModels\RightsHolder as DBRightsHolder;
 
 class MysqlRightsHolderRepository implements RightsHolderRepository
 {
@@ -35,6 +36,14 @@ class MysqlRightsHolderRepository implements RightsHolderRepository
 
     public function rightsHoldersOfAddresses(array $addresses): array
     {
-        // TODO: Implement rightsHoldersOfAddresses() method.
+        $addresses = array_map(function (Address $address) {
+            return $address->address();
+        }, $addresses);
+        $dbRightHolders = DBModels\RightsHolder::query()->whereIn('address', $addresses)->get();
+        $rightsHolders = $dbRightHolders->map(function (DBRightsHolder $rightsHolder) {
+           return $rightsHolder->rightsHolderDomainModel();
+        });
+
+        return $rightsHolders->toArray();
     }
 }

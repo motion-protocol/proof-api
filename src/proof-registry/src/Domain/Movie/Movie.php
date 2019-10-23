@@ -1,4 +1,5 @@
 <?php
+
 namespace ProofRegistry\Domain\Movie;
 
 use ProofRegistry\Domain\RightsHolder\RightsHolder;
@@ -6,9 +7,22 @@ use ProofRegistry\Domain\Shared\TokenId;
 
 class Movie
 {
+    /**
+     * @var ImdbId
+     */
     private $imdbId;
+    /**
+     * @var TokenId
+     */
     private $tokenId;
+    /**
+     * @var Share[]
+     */
     private $shares = [];
+    /**
+     * @var int
+     */
+    private $totalShares;
 
     /**
      * Movie constructor.
@@ -34,7 +48,7 @@ class Movie
      */
     public function imdbId(): ImdbId
     {
-        return  $this->imdbId;
+        return $this->imdbId;
     }
 
     /**
@@ -43,16 +57,13 @@ class Movie
      */
     public function addShares(RightsHolder $rightsHolder, int $amount): void
     {
-        $newShare = new Share($rightsHolder->address(), $amount);
+        $newShare = new Share($rightsHolder->address(), $amount, $this->totalShares + $amount);
+        $address = $newShare->rightsHolderAddress()->address();
+        $rightsHolderHasShares = isset($this->shares[$address]);
+        $this->shares[$address] = $rightsHolderHasShares ? $this->shares[$address]->add($newShare): $newShare;
 
-        foreach ($this->shares() as $key => $share) {
-            if ($share->rightsHolderAddress()->equals($newShare->rightsHolderAddress())) {
-                $this->shares[$key] = $share->add($newShare);
-                return;
-            }
-        }
-
-        $this->shares[] = $newShare;
+        $this->updateTotalShares();
+        $this->updateSharesPercentage();
     }
 
     /**
@@ -60,18 +71,22 @@ class Movie
      */
     public function shares(): array
     {
-        return $this->shares;
+        return array_values($this->shares);
     }
 
-    /**
-     * @return int
-     */
-    public function totalShareAmount(): int
+    private function updateTotalShares(): void
     {
-        $amounts = array_map(function (Share $share) {
+        $sharesAmounts = array_map(function (Share $share) {
             return $share->amount();
         }, $this->shares);
 
-        return array_sum($amounts);
+        $this->totalShares = array_sum($sharesAmounts);
+    }
+
+    private function updateSharesPercentage(): void
+    {
+        $this->shares = array_map(function (Share $share){
+            return $share->ofTotalShares($this->totalShares);
+        }, $this->shares);
     }
 }
