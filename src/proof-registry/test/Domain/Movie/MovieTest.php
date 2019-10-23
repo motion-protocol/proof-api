@@ -35,7 +35,7 @@ class MovieTest extends TestCase
         $movie->addShares($rightsHolder1, 1000);
         $movie->addShares($rightsHolder2, 2000);
 
-        $this->assertEquals(4000, $movie->totalShareAmount());
+        $this->assertEquals(2000, $movie->shares()[0]->amount());
         $this->assertCount(2, $movie->shares());
     }
 }

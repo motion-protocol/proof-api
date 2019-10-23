@@ -1,6 +1,7 @@
 <?php
 
 
+use ProofRegistry\Application\Movie\DTOs\MovieDTO;
 use ProofRegistry\Application\Movie\MovieApplicationService;
 use ProofRegistry\Application\Movie\MovieOfImdbIdQuery;
 use ProofRegistry\Application\Movie\NewMovieCommand;
@@ -51,8 +52,9 @@ class MovieApplicationServiceTest extends TestCase
 
         $movieAppService = new MovieApplicationService($movieRepository, $rightHolderRepository);
         $query = new MovieOfImdbIdQuery('tt2911666');
-        $returnedMovie = $movieAppService->movieOfImdbId($query);
+        $returnedDTO = $movieAppService->movieOfImdbId($query);
+        $expectedDTO = new MovieDTO($johnWickMovie);
 
-        $this->assertEquals($johnWickMovie, $returnedMovie);
+        $this->assertEquals($expectedDTO, $returnedDTO);
     }
 }
