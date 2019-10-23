@@ -18,6 +18,7 @@ class AppServiceProvider extends ServiceProvider
     public function register()
     {
         $this->app->bind(MovieRepository::class, MysqlMovieRepository::class);
+        $this->app->bind(RightsHolderRepository::class, MysqlRightsHolderRepository::class);
     }
 
     /**

@@ -73,10 +73,15 @@ class MovieApplicationService
         $name = $command->name();
 
         $movie = $this->movieRepository->movieOfTokenId($tokenId);
-        $rightsHolder = $this->rightsHolderRepository->rightsHolderOfAddress($address) ?? new RightsHolder($address, $name);
+        $rightsHolder = $this->rightsHolderRepository->rightsHolderOfAddress($address);
+        if (!$rightsHolder) {
+            $rightsHolder = new RightsHolder($address, $name);
+        }
         $rightsHolder->addRight($movie, $amount);
+        $movie->addShares($rightsHolder, $amount);
 
         $this->rightsHolderRepository->save($rightsHolder);
+        $this->movieRepository->save($movie);
 
     }
 

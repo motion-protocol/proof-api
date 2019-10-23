@@ -54,6 +54,14 @@ class RightsHolder
     }
 
     /**
+     * @return string
+     */
+    public function name(): string
+    {
+        return $this->name;
+    }
+
+    /**
      * @param MovieRight $newMovieRight
      */
     private function addToRightsOfTheSameToken(MovieRight $newMovieRight): void
