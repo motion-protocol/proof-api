@@ -58,12 +58,11 @@ class Movie
     public function addShares(RightsHolder $rightsHolder, int $amount): void
     {
         $newShare = new Share($rightsHolder->address(), $amount, $this->totalShares + $amount);
-        $address = $newShare->rightsHolderAddress()->address();
+        $address = $rightsHolder->address()->address();
         $rightsHolderHasShares = isset($this->shares[$address]);
         $this->shares[$address] = $rightsHolderHasShares ? $this->shares[$address]->add($newShare): $newShare;
 
         $this->updateTotalShares();
-        $this->updateSharesPercentage();
     }
 
     /**
@@ -81,10 +80,7 @@ class Movie
         }, $this->shares);
 
         $this->totalShares = array_sum($sharesAmounts);
-    }
 
-    private function updateSharesPercentage(): void
-    {
         $this->shares = array_map(function (Share $share){
             return $share->ofTotalShares($this->totalShares);
         }, $this->shares);
