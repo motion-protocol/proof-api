@@ -1,6 +1,7 @@
 <?php
 
 
+use ProofRegistry\Application\ApplicationServiceLifeCycle;
 use ProofRegistry\Application\Movie\DTOs\MovieDTO;
 use ProofRegistry\Application\Movie\MovieApplicationService;
 use ProofRegistry\Application\Movie\MovieOfImdbIdQuery;
@@ -20,8 +21,11 @@ class MovieApplicationServiceTest extends TestCase
         $movieRepository->shouldReceive('movieOfImdbId')->andReturn(null);
         $movieRepository->shouldReceive('save');
         $rightHolderRepository = Mockery::mock(RightsHolderRepository::class);
+        $appServiceLifeCycle = Mockery::mock(ApplicationServiceLifeCycle::class);
+        $appServiceLifeCycle->shouldReceive('begin');
+        $appServiceLifeCycle->shouldReceive('success');
 
-        $movieAppService = new MovieApplicationService($movieRepository, $rightHolderRepository);
+        $movieAppService = new MovieApplicationService($movieRepository, $rightHolderRepository, $appServiceLifeCycle);
         $newMovieCommand = new NewMovieCommand('tt2911666', '0x1234');
         $movieAppService->newMovie($newMovieCommand);
     }
@@ -33,8 +37,11 @@ class MovieApplicationServiceTest extends TestCase
         $movieRepository->shouldReceive('movieOfImdbId')->andReturn($movie);
         $movieRepository->shouldReceive('save');
         $rightHolderRepository = Mockery::mock(RightsHolderRepository::class);
+        $appServiceLifeCycle = Mockery::mock(ApplicationServiceLifeCycle::class);
+        $appServiceLifeCycle->shouldReceive('begin');
+        $appServiceLifeCycle->shouldReceive('success');
 
-        $movieAppService = new MovieApplicationService($movieRepository, $rightHolderRepository);
+        $movieAppService = new MovieApplicationService($movieRepository, $rightHolderRepository, $appServiceLifeCycle);
         $newMovieCommand = new NewMovieCommand('tt2911666', '0x1234');
         $movieAppService->newMovie($newMovieCommand);
     }
@@ -49,8 +56,11 @@ class MovieApplicationServiceTest extends TestCase
         $movieRepository->shouldReceive('movieOfImdbId')
             ->andReturn($johnWickMovie);
         $rightHolderRepository = Mockery::mock(RightsHolderRepository::class);
+        $appServiceLifeCycle = Mockery::mock(ApplicationServiceLifeCycle::class);
+        $appServiceLifeCycle->shouldReceive('begin');
+        $appServiceLifeCycle->shouldReceive('success');
 
-        $movieAppService = new MovieApplicationService($movieRepository, $rightHolderRepository);
+        $movieAppService = new MovieApplicationService($movieRepository, $rightHolderRepository, $appServiceLifeCycle);
         $query = new MovieOfImdbIdQuery('tt2911666');
         $returnedDTO = $movieAppService->movieOfImdbId($query);
         $expectedDTO = new MovieDTO($johnWickMovie);
