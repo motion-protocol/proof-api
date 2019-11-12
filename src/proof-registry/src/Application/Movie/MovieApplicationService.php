@@ -74,11 +74,28 @@ class MovieApplicationService
         $this->applicationServiceLifeCycle->success();
     }
 
+
+    /**
+     * @param MovieOfTokenIdQuery $query
+     * @return MovieDTO
+     */
+    public function movieOfTokenId(MovieOfTokenIdQuery $query): MovieDTO
+    {
+        $this->applicationServiceLifeCycle->begin();
+
+        $tokenId = new TokenId($query->tokenId());
+        $movie = $this->movieRepository->movieOfTokenId($tokenId);
+
+        $this->applicationServiceLifeCycle->success();
+
+        return new MovieDTO($movie);
+    }
+
     /**
      * @param MovieOfImdbIdQuery $query
      * @return MovieDTO
      */
-    public function movieOfImdbId(MovieOfImdbIdQuery $query)
+    public function movieOfImdbId(MovieOfImdbIdQuery $query): MovieDTO
     {
         $this->applicationServiceLifeCycle->begin();
 
@@ -149,7 +166,7 @@ class MovieApplicationService
     {
         return array_map(function (Share $share) use ($rightsHolders) {
             $rightsHolder = $this->findRightsHolderByAddress($rightsHolders, $share->rightsHolderAddress());
-            return $this->createMovieShareDTO($share, $rightsHolder);
+            return $this->createRightsHolderDTO($share, $rightsHolder);
         }, $shares);
     }
 
@@ -168,13 +185,12 @@ class MovieApplicationService
 
         return null;
     }
-
     /**
      * @param Share $share
      * @param RightsHolder|null $rightsHolder
      * @return RightsHolderDTO
      */
-    private function createMovieShareDTO(Share $share, ?RightsHolder $rightsHolder): RightsHolderDTO
+    private function createRightsHolderDTO(Share $share, ?RightsHolder $rightsHolder): RightsHolderDTO
     {
         $name = 'Unknown';
         if ($rightsHolder) {

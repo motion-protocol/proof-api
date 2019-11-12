@@ -7,7 +7,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use ProofRegistry\Application\Movie\AddRightHolderCommand;
 use ProofRegistry\Application\Movie\MovieApplicationService;
-use ProofRegistry\Application\Movie\MovieOfImdbIdQuery;
+use ProofRegistry\Application\Movie\MovieOfTokenIdQuery;
 use ProofRegistry\Application\Movie\MovieRightsHoldersQuery;
 use ProofRegistry\Application\Movie\NewMovieCommand;
 
@@ -34,10 +34,10 @@ class MoviesController extends Controller
         $this->movieApplicationService->newMovie($command);
     }
 
-    public function getMovieInfo(string $imdbId)
+    public function getMovieInfo(string $tokenId)
     {
-        $query = new MovieOfImdbIdQuery($imdbId);
-        $movieDTO = $this->movieApplicationService->movieOfImdbId($query);
+        $query = new MovieOfTokenIdQuery($tokenId);
+        $movieDTO = $this->movieApplicationService->movieOfTokenId($query);
 
         return response()->json($movieDTO);
     }
