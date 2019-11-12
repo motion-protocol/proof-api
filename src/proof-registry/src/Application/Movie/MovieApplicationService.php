@@ -181,6 +181,6 @@ class MovieApplicationService
             $name = $rightsHolder->name();
         }
 
-        return new RightsHolderDTO($share->rightsHolderAddress()->address(), $name, $share->percentage());
+        return new RightsHolderDTO($share->rightsHolderAddress()->address(), $name, $share->percentage(), $share->amount());
     }
 }

@@ -10,19 +10,22 @@ class RightsHolderDTO
 {
     public $address;
     public $name;
-    public $shares;
+    public $sharesPercentage;
+    public $sharesAmount;
 
     /**
      * RightsHolderDTO constructor.
      * @param string $address
      * @param string $name
-     * @param string $shares
+     * @param string $sharesPercentage
+     * @param string $sharesAmount
      */
-    public function __construct(string $address, string $name, string $shares)
+    public function __construct(string $address, string $name, string $sharesPercentage, string $sharesAmount)
     {
         $this->address = $address;
         $this->name = $name;
-        $this->shares = $shares;
+        $this->sharesPercentage = $sharesPercentage;
+        $this->sharesAmount = $sharesAmount;
     }
 
 }

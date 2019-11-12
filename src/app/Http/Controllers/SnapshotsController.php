@@ -3,45 +3,33 @@
 
 namespace App\Http\Controllers;
 
-
-use ProofRegistry\Domain\Movie\Share;
-use ProofRegistry\Domain\Shared\Services\SharesSnapshotRepository;
+use ProofRegistry\Application\Snapshot\SharesOfHashQuery;
+use ProofRegistry\Application\Snapshot\SnapshotApplicationService;
 
 class SnapshotsController extends Controller
 {
     /**
-     * @var SharesSnapshotRepository
+     * @var SnapshotApplicationService
      */
-    private $sharesSnapshotRepo;
+    private $snapshotApplicationService;
 
 
     /**
      * SignatureController constructor.
-     * @param SharesSnapshotRepository $sharesSnapshotRepo
+     * @param SnapshotApplicationService $snapshotApplicationService
      */
-    public function __construct(SharesSnapshotRepository $sharesSnapshotRepo)
+    public function __construct(SnapshotApplicationService $snapshotApplicationService)
     {
-        $this->sharesSnapshotRepo = $sharesSnapshotRepo;
+        $this->snapshotApplicationService = $snapshotApplicationService;
     }
 
     public function getSharesByHash(string $hash)
     {
-        $shares = $this->sharesSnapshotRepo->sharesOfHash($hash);
+        $query = new SharesOfHashQuery($hash);
+        $sharesDTO = $this->snapshotApplicationService->sharesOfHash($query);
 
-        return response()->json($this->getSharesDto($shares));
+        return response()->json($sharesDTO);
     }
 
-    /**
-     * @param array $shares
-     * @return array
-     */
-    private function getSharesDto(array $shares): array
-    {
-        return array_map(function (Share $share) {
-            return [
-                'address' => $share->rightsHolderAddress()->address(),
-                'shares' => (string) $share->percentage(),
-            ];
-        }, $shares);
-    }
+
 }
