@@ -30,25 +30,17 @@ class AbiHash implements Hash
         $word2 = self::sizeHex32($addresses);
 
         $hex20Addresses = array_map(function ($address) {
+            $address = str_replace('0x', '', $address);
             return self::hex20($address);
         }, $addresses);
 
         $hex12Amounts = array_map(function ($amount) {
-            return self::hex12($amount);
+            return self::hex12(dechex($amount));
         }, $amounts);
 
-        uasort($hex20Addresses, function ($a, $b) {
-            $aInteger = hexdec($a);
-            $bInteger = hexdec($b);
-            $diff = $aInteger - $bInteger;
+        self::sortAddresses($hex20Addresses);
 
-            return max(min($diff, 1), -1);
-        });
-
-        $words = [];
-        foreach ($hex20Addresses as $key => $hex20Address) {
-            $words[] = $hex20Address . $hex12Amounts[$key];
-        }
+        $words = self::combineAddressesAndAmounts($hex20Addresses, $hex12Amounts);
 
         $words = array_merge([$word1, $word2], $words);
 
@@ -72,6 +64,7 @@ class AbiHash implements Hash
      */
     private static function hex32(int $aNumber): string
     {
+
         $hexNumber = dechex($aNumber);
         $zeros = str_repeat('0', 64);
         $hex32 = $zeros . $hexNumber;
@@ -98,12 +91,11 @@ class AbiHash implements Hash
     }
 
     /**
-     * @param int $aNumber
+     * @param string $hexNumber
      * @return string
      */
-    private static function hex12(int $aNumber): string
+    private static function hex12(string $hexNumber): string
     {
-        $hexNumber = dechex($aNumber);
         $zeros = str_repeat('0', 24);
         $hex12 = $zeros . $hexNumber;
         while (strlen($hex12) > 24) {
@@ -111,5 +103,33 @@ class AbiHash implements Hash
         }
 
         return $hex12;
+    }
+
+    /**
+     * @param $hex20Addresses
+     */
+    private static function sortAddresses(&$hex20Addresses): void
+    {
+        uasort($hex20Addresses, function ($a, $b) {
+            $aInteger = hexdec($a);
+            $bInteger = hexdec($b);
+            $diff = $aInteger - $bInteger;
+
+            return max(min($diff, 1), -1);
+        });
+    }
+
+    /**
+     * @param array $hex20Addresses
+     * @param array $hex12Amounts
+     * @return array
+     */
+    private static function combineAddressesAndAmounts(array $hex20Addresses, array $hex12Amounts): array
+    {
+        $words = [];
+        foreach ($hex20Addresses as $key => $hex20Address) {
+            $words[] = $hex20Address . $hex12Amounts[$key];
+        }
+        return $words;
     }
 }

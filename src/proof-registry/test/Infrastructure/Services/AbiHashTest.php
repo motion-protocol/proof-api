@@ -40,4 +40,11 @@ class AbiHashTest extends TestCase
         $this->assertEquals($expectedHash, $hash3);
         $this->assertEquals($expectedHash, $hash4);
     }
+
+    public function testItEncodesAndHashShortAddresses()
+    {
+        $hash = AbiHash::hash(["0x12345", self::ADD_2, self::ADD_1], [self::AMOUNT, self::AMOUNT, self::AMOUNT]);
+        $expectedHash = '0xdc15010dcc136407cda6b53dc2c4a95ab87b3e8105d27f2b32cf34dd2aec4947';
+        $this->assertEquals($expectedHash, $hash);
+    }
 }
