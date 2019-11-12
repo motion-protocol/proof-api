@@ -27,11 +27,14 @@ class MoviesController extends Controller
         $this->movieApplicationService = $movieApplicationService;
     }
 
-    public function newMovie(Request $request, string $imdbId)
+    public function newMovie(Request $request)
     {
         $tokenId = $request->get('tokenId');
+        $imdbId = $request->get('imdbId');
         $command = new NewMovieCommand($imdbId, $tokenId);
         $this->movieApplicationService->newMovie($command);
+
+        return response()->json(['success' => true]);
     }
 
     public function getMovieInfo(string $tokenId)

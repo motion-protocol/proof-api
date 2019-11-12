@@ -7,6 +7,7 @@ namespace ProofRegistry\Application\Movie;
 use ProofRegistry\Application\ApplicationServiceLifeCycle;
 use ProofRegistry\Application\Movie\DTOs\MovieDTO;
 use ProofRegistry\Application\Movie\DTOs\RightsHolderDTO;
+use ProofRegistry\Application\Movie\Exceptions\MovieAlreadyAddedException;
 use ProofRegistry\Domain\Movie\ImdbId;
 use ProofRegistry\Domain\Movie\Movie;
 use ProofRegistry\Domain\Movie\MovieRepository;
@@ -58,6 +59,7 @@ class MovieApplicationService
 
     /**
      * @param NewMovieCommand $command
+     * @throws MovieAlreadyAddedException
      */
     public function newMovie(NewMovieCommand $command): void
     {
@@ -65,11 +67,16 @@ class MovieApplicationService
 
         $imdbId = new ImdbId($command->imdbId());
         $tokenId = new TokenId($command->tokenId());
-        $movie = $this->movieRepository->movieOfImdbId($imdbId);
-        if (!$movie) {
-            $movie = new Movie($imdbId, $tokenId);
-            $this->movieRepository->save($movie);
+        $movieWithTheSameImdbId = $this->movieRepository->movieOfImdbId($imdbId);
+        $movieWithTheSameTokenId = $this->movieRepository->movieOfTokenId($tokenId);
+
+        if ($movieWithTheSameImdbId || $movieWithTheSameTokenId) {
+            throw new MovieAlreadyAddedException();
         }
+
+        $movie = new Movie($imdbId, $tokenId);
+        $this->movieRepository->save($movie);
+
 
         $this->applicationServiceLifeCycle->success();
     }
@@ -185,6 +192,7 @@ class MovieApplicationService
 
         return null;
     }
+
     /**
      * @param Share $share
      * @param RightsHolder|null $rightsHolder
