@@ -39,7 +39,7 @@ class SnapshotService
         }, $shares);
 
         $amounts = array_map(function (Share $share) {
-            return (int) ($share->percentage() * 10000);
+            return $share->amount();
         }, $shares);
 
         $hash = $this->hasher->hash($addresses, $amounts);
