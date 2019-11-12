@@ -5,11 +5,13 @@ namespace App\Exceptions;
 use Exception;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use ProofRegistry\Application\Movie\Exceptions\MovieAlreadyAddedException;
+use ProofRegistry\Application\Movie\Exceptions\MovieNotFoundException;
 
 class Handler extends ExceptionHandler
 {
     const STATUS_CODES = [
         MovieAlreadyAddedException::class => 400,
+        MovieNotFoundException::class => 404,
     ];
     /**
      * A list of the exception types that are not reported.
@@ -54,6 +56,11 @@ class Handler extends ExceptionHandler
         if ($statusCode) {
             return response()->json(['error' => $exception->getMessage()])->setStatusCode($statusCode);
         }
+
+        if (!env('APP_DEBUG')) {
+            return response()->json(['error' => $exception->getMessage()])->setStatusCode(500);
+        }
+
         return parent::render($request, $exception);
     }
 }

@@ -8,6 +8,7 @@ use ProofRegistry\Application\ApplicationServiceLifeCycle;
 use ProofRegistry\Application\Movie\DTOs\MovieDTO;
 use ProofRegistry\Application\Movie\DTOs\RightsHolderDTO;
 use ProofRegistry\Application\Movie\Exceptions\MovieAlreadyAddedException;
+use ProofRegistry\Application\Movie\Exceptions\MovieNotFoundException;
 use ProofRegistry\Domain\Movie\ImdbId;
 use ProofRegistry\Domain\Movie\Movie;
 use ProofRegistry\Domain\Movie\MovieRepository;
@@ -85,6 +86,7 @@ class MovieApplicationService
     /**
      * @param MovieOfTokenIdQuery $query
      * @return MovieDTO
+     * @throws MovieNotFoundException
      */
     public function movieOfTokenId(MovieOfTokenIdQuery $query): MovieDTO
     {
@@ -92,7 +94,9 @@ class MovieApplicationService
 
         $tokenId = new TokenId($query->tokenId());
         $movie = $this->movieRepository->movieOfTokenId($tokenId);
-
+        if (!$movie) {
+            throw new MovieNotFoundException();
+        }
         $this->applicationServiceLifeCycle->success();
 
         return new MovieDTO($movie);
@@ -101,6 +105,7 @@ class MovieApplicationService
     /**
      * @param MovieOfImdbIdQuery $query
      * @return MovieDTO
+     * @throws MovieNotFoundException
      */
     public function movieOfImdbId(MovieOfImdbIdQuery $query): MovieDTO
     {
@@ -108,7 +113,9 @@ class MovieApplicationService
 
         $imdbId = new ImdbId($query->imdbId());
         $movie = $this->movieRepository->movieOfImdbId($imdbId);
-
+        if (!$movie) {
+            throw new MovieNotFoundException();
+        }
         $this->applicationServiceLifeCycle->success();
 
         return new MovieDTO($movie);
@@ -116,6 +123,7 @@ class MovieApplicationService
 
     /**
      * @param AddRightHolderCommand $command
+     * @throws MovieNotFoundException
      */
     public function addRightsHolder(AddRightHolderCommand $command)
     {
@@ -127,6 +135,9 @@ class MovieApplicationService
         $name = $command->name();
 
         $movie = $this->movieRepository->movieOfTokenId($tokenId);
+        if (!$movie) {
+            throw new MovieNotFoundException();
+        }
         $rightsHolder = $this->rightsHolderRepository->rightsHolderOfAddress($address);
         if (!$rightsHolder) {
             $rightsHolder = new RightsHolder($address, $name);
@@ -145,6 +156,7 @@ class MovieApplicationService
     /**
      * @param MovieRightsHoldersQuery $query
      * @return array
+     * @throws MovieNotFoundException
      */
     public function movieRightsHolders(MovieRightsHoldersQuery $query): array
     {
@@ -152,6 +164,9 @@ class MovieApplicationService
 
         $tokenId = new TokenId($query->tokenId());
         $movie = $this->movieRepository->movieOfTokenId($tokenId);
+        if (!$movie) {
+            throw new MovieNotFoundException();
+        }
         $shares = $movie->shares();
         $rightsHoldersAddresses = array_map(function (Share $shares) {
             return $shares->rightsHolderAddress();
