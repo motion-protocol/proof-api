@@ -14,10 +14,15 @@ use ProofRegistry\Domain\Movie\Share;
 use ProofRegistry\Domain\RightsHolder\Address;
 use ProofRegistry\Domain\RightsHolder\RightsHolder;
 use ProofRegistry\Domain\RightsHolder\RightsHolderRepository;
+use ProofRegistry\Domain\Shared\Services\SnapshotService;
 use ProofRegistry\Domain\Shared\TokenId;
 
 class MovieApplicationService
 {
+    /**
+     * @var SnapshotService
+     */
+    private $signatureService;
     /**
      * @var MovieRepository
      */
@@ -33,16 +38,19 @@ class MovieApplicationService
 
     /**
      * MovieApplicationService constructor.
+     * @param SnapshotService $signatureService
      * @param MovieRepository $movieRepository
      * @param RightsHolderRepository $rightsHolderRepository
      * @param ApplicationServiceLifeCycle $applicationServiceLifeCycle
      */
     public function __construct(
+        SnapshotService $signatureService,
         MovieRepository $movieRepository,
         RightsHolderRepository $rightsHolderRepository,
         ApplicationServiceLifeCycle $applicationServiceLifeCycle
     )
     {
+        $this->signatureService = $signatureService;
         $this->movieRepository = $movieRepository;
         $this->rightsHolderRepository = $rightsHolderRepository;
         $this->applicationServiceLifeCycle = $applicationServiceLifeCycle;
@@ -104,6 +112,7 @@ class MovieApplicationService
 
         $this->rightsHolderRepository->save($rightsHolder);
         $this->movieRepository->save($movie);
+        $this->signatureService->snapshotShares($movie->shares());
 
         $this->applicationServiceLifeCycle->success();
 

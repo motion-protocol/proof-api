@@ -10,6 +10,7 @@ use ProofRegistry\Domain\Movie\ImdbId;
 use ProofRegistry\Domain\Movie\Movie;
 use ProofRegistry\Domain\Movie\MovieRepository;
 use ProofRegistry\Domain\RightsHolder\RightsHolderRepository;
+use ProofRegistry\Domain\Shared\Services\SnapshotService;
 use ProofRegistry\Domain\Shared\TokenId;
 use Tests\TestCase;
 
@@ -24,8 +25,9 @@ class MovieApplicationServiceTest extends TestCase
         $appServiceLifeCycle = Mockery::mock(ApplicationServiceLifeCycle::class);
         $appServiceLifeCycle->shouldReceive('begin');
         $appServiceLifeCycle->shouldReceive('success');
+        $signatureService = Mockery::mock(SnapshotService::class);
 
-        $movieAppService = new MovieApplicationService($movieRepository, $rightHolderRepository, $appServiceLifeCycle);
+        $movieAppService = new MovieApplicationService($signatureService, $movieRepository, $rightHolderRepository, $appServiceLifeCycle);
         $newMovieCommand = new NewMovieCommand('tt2911666', '0x1234');
         $movieAppService->newMovie($newMovieCommand);
     }
@@ -40,8 +42,8 @@ class MovieApplicationServiceTest extends TestCase
         $appServiceLifeCycle = Mockery::mock(ApplicationServiceLifeCycle::class);
         $appServiceLifeCycle->shouldReceive('begin');
         $appServiceLifeCycle->shouldReceive('success');
-
-        $movieAppService = new MovieApplicationService($movieRepository, $rightHolderRepository, $appServiceLifeCycle);
+        $signatureService = Mockery::mock(SnapshotService::class);
+        $movieAppService = new MovieApplicationService($signatureService, $movieRepository, $rightHolderRepository, $appServiceLifeCycle);
         $newMovieCommand = new NewMovieCommand('tt2911666', '0x1234');
         $movieAppService->newMovie($newMovieCommand);
     }
@@ -59,8 +61,9 @@ class MovieApplicationServiceTest extends TestCase
         $appServiceLifeCycle = Mockery::mock(ApplicationServiceLifeCycle::class);
         $appServiceLifeCycle->shouldReceive('begin');
         $appServiceLifeCycle->shouldReceive('success');
+        $signatureService = Mockery::mock(SnapshotService::class);
 
-        $movieAppService = new MovieApplicationService($movieRepository, $rightHolderRepository, $appServiceLifeCycle);
+        $movieAppService = new MovieApplicationService($signatureService, $movieRepository, $rightHolderRepository, $appServiceLifeCycle);
         $query = new MovieOfImdbIdQuery('tt2911666');
         $returnedDTO = $movieAppService->movieOfImdbId($query);
         $expectedDTO = new MovieDTO($johnWickMovie);

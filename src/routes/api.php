@@ -21,3 +21,5 @@ Route::post('/movies/{imdbId}', 'MoviesController@newMovie');
 Route::get('/movies/{imdbId}', 'MoviesController@getMovieInfo');
 Route::post('/tokens/{tokenId}', 'MoviesController@addRightsHolder');
 Route::get('/tokens/{tokenId}', 'MoviesController@listRightsHolders');
+
+Route::get('/snapshots/shares/{hash}', 'SnapshotsController@getSharesByHash');
