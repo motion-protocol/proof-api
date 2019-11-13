@@ -3,6 +3,7 @@
 
 use ProofRegistry\Application\ApplicationServiceLifeCycle;
 use ProofRegistry\Application\Movie\DTOs\MovieDTO;
+use ProofRegistry\Application\Movie\Exceptions\MovieAlreadyAddedException;
 use ProofRegistry\Application\Movie\MovieApplicationService;
 use ProofRegistry\Application\Movie\MovieOfImdbIdQuery;
 use ProofRegistry\Application\Movie\NewMovieCommand;
@@ -20,6 +21,7 @@ class MovieApplicationServiceTest extends TestCase
     {
         $movieRepository = Mockery::mock(MovieRepository::class);
         $movieRepository->shouldReceive('movieOfImdbId')->andReturn(null);
+        $movieRepository->shouldReceive('movieOfTokenId')->andReturn(null);
         $movieRepository->shouldReceive('save');
         $rightHolderRepository = Mockery::mock(RightsHolderRepository::class);
         $appServiceLifeCycle = Mockery::mock(ApplicationServiceLifeCycle::class);
@@ -37,6 +39,7 @@ class MovieApplicationServiceTest extends TestCase
         $movie = Mockery::mock(Movie::class);
         $movieRepository = Mockery::mock(MovieRepository::class);
         $movieRepository->shouldReceive('movieOfImdbId')->andReturn($movie);
+        $movieRepository->shouldReceive('movieOfTokenId')->andReturn($movie);
         $movieRepository->shouldReceive('save');
         $rightHolderRepository = Mockery::mock(RightsHolderRepository::class);
         $appServiceLifeCycle = Mockery::mock(ApplicationServiceLifeCycle::class);
@@ -45,7 +48,11 @@ class MovieApplicationServiceTest extends TestCase
         $signatureService = Mockery::mock(SnapshotService::class);
         $movieAppService = new MovieApplicationService($signatureService, $movieRepository, $rightHolderRepository, $appServiceLifeCycle);
         $newMovieCommand = new NewMovieCommand('tt2911666', '0x1234');
+
+        $this->expectException(MovieAlreadyAddedException::class);
+
         $movieAppService->newMovie($newMovieCommand);
+
     }
 
     public function testMovieOfImdbId()
