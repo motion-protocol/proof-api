@@ -1,0 +1,27 @@
+dist: xenial
+language: php
+php:
+- 7.3
+cache:
+  directories:
+  - vendor
+before_script:
+- cd src
+- cp .travis.env .env
+- composer self-update
+- composer install --no-interaction
+script:
+- vendor/bin/phpunit
+deploy:
+  provider: elasticbeanstalk
+  access_key_id: $ACCESS_KEY_ID
+  secret_access_key: $SECRET_ACCESS_KEY
+  region: eu-central-1
+  app: proof-api
+  env: ProofApi-env
+  bucket_name: elasticbeanstalk-eu-central-1-600030182125
+  skip_cleanup: true
+env:
+  global:
+  - secure: DHU2r/YjoCB7ZWEY6OYnpdqmzDj5FN22x39VrgCDzDXItMgFS1mVD3zgVZ9stBgMlrs8u7vlBAvh+6Ca1CyFpKhrVotClUTelf3WpWNZPuOy0BTJNika1QWPdXJYjrsuI7tzTFNSlTH7UD1/6rIrRp4u0a+3fsC7NxNT4OIHazr8tC+gEYs0be49GN3TsJRLXF18izVTKtoDpt40t/BWk79vAwOcdpFQGGVPzZS1Vv/vgt9FRLXVJdurtVqF9W78JgtkvMNbglPMkBTwrd6x5rNgXdZ7kMbkKJq2slD93opzob9O5NRMT03qYBnhJKbxIQQtBrbGbKEHKVuf+WAhTQaSqcnuaWhQcGsiUZviUJVFfhl0ElyyNJ/s1hlMQepJmQnD4POSI8jj1uQNXhUfXkg++lOkA0AhhpEquBXrfs4EjPNoJlF8ixXNnjA18q379QaFo42q9ysbWyL+Y+GN+0haYcezIcm61XZll9h/Ti5QmudesKYRwY9bfmmwurRf5F7kX76icg+SHKVky15HrDei8QEBuHDw4lojb8RAy4FhYZZcgWvr/U8/SWwsthWcIUBul46mFhg5PWC6dGsbhhg5fxixYApxDo6YD+mF0ooYC4YADQ7B7/1AQZkEttsnRccKY4aBc0xWF0G0oIrbLHCpex5U0GCnDII4Vg7+AIQ=
+  - secure: NK2Sk9piAVDKzTdZt6yt2cADYo0TslXtMNRim5JGvuxzK6hUTLsv7R+V8jNs2i1mh8YISjanG5p3KJd5dvSDfBPpW/ypmkjQbRtSOrgGZwSNb1VDUZjHRXGj0X4vbms1ixchwphg3FjInFyyXESey2C6A3YWwVS7KaDMZnfnMxLcVjJQeKrBsP1nw0x1FcKStt/3aqyNAhDijgLM9ylTIPa+j2szOIuhLxfATAb9Dp6dflHSqs7hyhyAOEPOJ20sOqOCwcsHt2HsYGGCPB387SYuTFedWj+Vv7z9NyqvU7U4r6e/7Pdhk3wt0TqHBsopN1JGJt5ZvBi40CpquGlBwrLGw+k9tdj/FW5tiDt2qXC8FLLCEf6WOsiJUB4ueJEi/ZpasN8YGmHjKUk/J3NLNVSsnDT/BQKszXO2I6Q4Uv4AYLGRCgrtb4zBo4v2C2WSZkv2hXxm7tAsEF8G0Je1eOXSGd27uoiw+egaidf9f29Fftt5mqmH5yrnSPQv3cLCpn9TQrNicucK4pmNvGRjZFPY/nhInkYgY/Z2NA8LEvp/ZWcvVCB+EcfIghE/u7hqSfwo869K6BPbG3TpdUASklwUywSPsjUCEHHG+zR0EYA2zaYjeQ1tKLAKrVGSx6gWP2UrB6Jw+XvqkQTi+72uVq5MaLTlKQHWwO1HAn3jJT4=
